@@ -139,7 +139,7 @@ fun AnswerEntity.toAnswer(owner: UserEntity, lastEditor: UserEntity?): Answer =
 fun AnswerDraftEntity.toAnswerDraft(): AnswerDraft =
     AnswerDraft(
         questionId = questionId,
-        questionTitle = questionTitle,
+        questionTitle = questionTitle.toHtml().toString(),
         updatedDate = updatedDate,
         bodyMarkdown = bodyMarkdown,
         site = site
