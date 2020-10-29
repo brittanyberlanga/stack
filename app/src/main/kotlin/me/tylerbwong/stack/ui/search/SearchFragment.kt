@@ -8,7 +8,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.insetter.applySystemWindowInsetsToPadding
 import me.tylerbwong.adapter.DynamicListAdapter
 import me.tylerbwong.stack.R
-import me.tylerbwong.stack.data.model.SearchPayload
 import me.tylerbwong.stack.databinding.HomeFragmentBinding
 import me.tylerbwong.stack.ui.BaseFragment
 import me.tylerbwong.stack.ui.home.FilterInputItem
@@ -48,7 +47,7 @@ class SearchFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::in
         }
 
         viewModel.siteLiveData.observe(viewLifecycleOwner) {
-            viewModel.search(SearchPayload.empty())
+            viewModel.search()
         }
 
         viewModel.refreshing.observe(viewLifecycleOwner) {
