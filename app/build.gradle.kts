@@ -95,10 +95,6 @@ dependencies {
     implementation(Dep.daggerHiltAndroid)
     kapt(Dep.daggerHiltAndroidCompiler)
 
-    // firebase
-    implementation(Dep.firebaseAnalytics)
-    implementation(Dep.firebaseCrashlytics)
-
     // insetter
     implementation(Dep.insetter)
 
@@ -131,7 +127,9 @@ dependencies {
     implementation(Dep.retrofitMoshiConverter)
 
     // play
-    implementation(Dep.playCore)
+    playImplementation(Dep.playCore)
+    playImplementation(Dep.firebaseAnalytics)
+    playImplementation(Dep.firebaseCrashlytics)
 
     // testing
     testImplementation(Dep.androidxTestCore)
@@ -146,11 +144,6 @@ dependencies {
     androidTestImplementation(Dep.barista)
     androidTestImplementation(Dep.espresso)
     androidTestImplementation(Dep.espressoIntents)
-}
-
-val googleServices = file("google-services.json")
-if (!googleServices.exists()) {
-    file("fake-google-services.json").copyTo(googleServices, overwrite = true)
 }
 
 apply(plugin = "com.google.gms.google-services")

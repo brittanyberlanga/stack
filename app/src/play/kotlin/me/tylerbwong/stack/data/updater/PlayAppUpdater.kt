@@ -1,19 +1,17 @@
-package me.tylerbwong.stack.data
+package me.tylerbwong.stack.data.updater
 
+import android.app.Activity
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType.FLEXIBLE
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.google.android.play.core.tasks.Task
-import dagger.hilt.android.scopes.ActivityScoped
-import me.tylerbwong.stack.ui.MainActivity
-import javax.inject.Inject
+import me.tylerbwong.stack.data.updater.AppUpdater.Companion.APP_UPDATE_REQUEST_CODE
 
-@ActivityScoped
-class AppUpdater @Inject constructor(private val manager: AppUpdateManager) {
+class PlayAppUpdater(private val manager: AppUpdateManager) : AppUpdater {
 
-    fun checkForUpdate(activity: MainActivity) {
+    override fun checkForUpdate(activity: Activity) {
+        if (activity !is InstallStateUpdatedListener) return
         manager.registerListener(activity)
 
         manager.appUpdateInfo.addOnSuccessListener {
@@ -25,7 +23,7 @@ class AppUpdater @Inject constructor(private val manager: AppUpdateManager) {
         }
     }
 
-    fun checkForPendingInstall(
+    override fun checkForPendingInstall(
         onDownloadFinished: () -> Unit,
         onDownloadFailed: () -> Unit
     ) {
@@ -37,13 +35,12 @@ class AppUpdater @Inject constructor(private val manager: AppUpdateManager) {
         }
     }
 
-    fun completeUpdate(): Task<Void> = manager.completeUpdate()
-
-    fun unregisterListener(listener: InstallStateUpdatedListener) {
-        manager.unregisterListener(listener)
+    override fun completeUpdate() {
+        manager.completeUpdate()
     }
 
-    companion object {
-        const val APP_UPDATE_REQUEST_CODE = 3141
+    override fun unregisterListener(activity: Activity) {
+        if (activity !is InstallStateUpdatedListener) return
+        manager.unregisterListener(activity)
     }
 }

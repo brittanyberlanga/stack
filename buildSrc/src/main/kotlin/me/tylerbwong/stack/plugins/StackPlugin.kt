@@ -12,8 +12,8 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
@@ -57,6 +57,53 @@ class StackPlugin : Plugin<Project> {
                     isShrinkResources = true
                 }
             }
+
+            flavorDimensions("distribution")
+            productFlavors {
+                /**
+                 * Represents a flavor with no analytics or crash reporting registered.
+                 */
+                register("common") {
+                    dimension("distribution")
+                }
+                /**
+                 * Represents a flavor with Firebase analytics and Crashlytics enabled. This is the
+                 * flavor that gets uploaded to the Google Play Store.
+                 */
+                register("play") {
+                    dimension("distribution")
+                }
+            }
+
+            applicationVariants.all {
+                if (name.contains("play", ignoreCase = true)) {
+                    val googleServices = file("src/play/google-services.json")
+                    val fakeGoogleServices = file("src/play/fake-google-services.json")
+                    if (!googleServices.exists() && fakeGoogleServices.exists()) {
+                        fakeGoogleServices.copyTo(googleServices, overwrite = true)
+                    }
+                } else {
+                    project.tasks.configureEach {
+                        val playTasks = listOf("crashlytics", "googleservices")
+                        if (playTasks.any { name.contains(it, ignoreCase = true) }) {
+                            enabled = false
+                        }
+                    }
+                }
+            }
+
+            (sourceSets) {
+                "common" {
+                    java {
+                        srcDir("src/common/kotlin")
+                    }
+                }
+                "play" {
+                    java {
+                        srcDir("src/play/kotlin")
+                    }
+                }
+            }
         }
     }
 
@@ -98,9 +145,23 @@ class StackPlugin : Plugin<Project> {
             }
         }
 
-        sourceSets["main"].java.srcDir("src/main/kotlin")
-        sourceSets["test"].java.srcDir("src/test/kotlin")
-        sourceSets["androidTest"].java.srcDir("src/androidTest/kotlin")
+        (sourceSets) {
+            "main" {
+                java {
+                    srcDir("src/main/kotlin")
+                }
+            }
+            "test" {
+                java {
+                    srcDir("src/test/kotlin")
+                }
+            }
+            "androidTest" {
+                java {
+                    srcDir("src/androidTest/kotlin")
+                }
+            }
+        }
     }
 
     private fun Project.configureStaticAnalysis() {
