@@ -1,6 +1,8 @@
 package me.tylerbwong.stack.data.network.di
 
 import android.content.Context
+import android.net.ConnectivityManager
+import androidx.core.content.getSystemService
 import com.chuckerteam.chucker.api.ChuckerCollector
 import com.chuckerteam.chucker.api.ChuckerInterceptor
 import dagger.Lazy
@@ -13,6 +15,7 @@ import dagger.multibindings.IntoSet
 import me.tylerbwong.stack.BuildConfig
 import me.tylerbwong.stack.data.auth.AuthInterceptor
 import me.tylerbwong.stack.data.site.SiteInterceptor
+import me.tylerbwong.stack.ui.utils.ConnectivityChecker
 import okhttp3.Call
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -27,6 +30,15 @@ annotation class DebugInterceptor
 @Module
 @InstallIn(SingletonComponent::class)
 class NetworkModule {
+    @[Provides Singleton]
+    fun provideConnectivityManager(@ApplicationContext context: Context): ConnectivityChecker? {
+        val connectivityManager = context.getSystemService<ConnectivityManager>()
+        return if (connectivityManager != null) {
+            ConnectivityChecker(connectivityManager)
+        } else {
+            null
+        }
+    }
 
     @[Provides IntoSet DebugInterceptor]
     fun provideHttpLoggingInterceptor(): Interceptor = HttpLoggingInterceptor().apply {

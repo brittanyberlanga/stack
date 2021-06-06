@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -50,6 +51,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(
 
     @Inject
     lateinit var appUpdater: AppUpdater
+
+    override val anchorView: View
+        get() = binding.bottomNav
 
     private val viewModel by viewModels<MainViewModel>()
 
